@@ -38,7 +38,7 @@ const importData = async () => {
       // ─────────────── CRICKET (12 products) ───────────────
       {
         name: 'Pro English Willow Cricket Bat',
-        images: ['/cricket_bat.png'],
+        images: ['/products/cricket_bat.png'],
         description: 'Premium grade 1 English willow cricket bat with huge edges and perfect balance. Match ready. Comes with factory-fitted toe guard and fully knocked-in. Ideal for power hitters who demand explosive performance in every shot.',
         brand: 'SK Sports',
         category: cricket,
@@ -49,7 +49,7 @@ const importData = async () => {
       },
       {
         name: 'Premium Titanium Cricket Helmet',
-        images: ['/premium_cricket_helmet.png'],
+        images: ['/products/premium_cricket_helmet.png'],
         description: 'High protection titanium grille helmet with supreme comfort and ventilation, perfect for long innings. Steel grille tested to BS7928:2013 standard. Adjustable inner foam padding for a custom fit.',
         brand: 'SK Sports',
         category: cricket,
@@ -60,7 +60,7 @@ const importData = async () => {
       },
       {
         name: 'Professional Leather Cricket Ball',
-        images: ['/cricket_ball.png'],
+        images: ['/products/cricket_ball.png'],
         description: 'Alum tanned leather cricket ball tailored for club matches. Exceptional seam and shape retention. Four piece construction, hand-stitched with a prominent seam for late swing and sharp movement.',
         brand: 'SK Sports',
         category: cricket,
@@ -71,7 +71,7 @@ const importData = async () => {
       },
       {
         name: 'Cricket Batting Pads (Junior)',
-        images: ['/cricket_pads.png'],
+        images: ['/products/cricket_pads.png'],
         description: 'Lightweight junior batting pads crafted for young cricketers. High density foam bolsters offer maximum protection without restricting movement. Velcro strap system for secure fit.',
         brand: 'SK Sports',
         category: cricket,
@@ -82,7 +82,7 @@ const importData = async () => {
       },
       {
         name: 'Cricket Batting Gloves Pro',
-        images: ['/cricket_batting_gloves.png'],
+        images: ['/products/cricket_batting_gloves.png'],
         description: 'Tournament-grade batting gloves with full sheepskin palm, multi-piece finger protection and snug wrist strap. Excellent feel with superior protection on both hands.',
         brand: 'SK Sports',
         category: cricket,
@@ -93,7 +93,7 @@ const importData = async () => {
       },
       {
         name: 'Cricket Wicket Keeping Gloves',
-        images: ['/cricket_wk_gloves.png'],
+        images: ['/products/cricket_wk_gloves.png'],
         description: 'Pro-spec wicket keeping gloves with oversized sausage fingers and inners for unparalleled catching grip. Extended palm for maximum surface coverage.',
         brand: 'SK Sports',
         category: cricket,

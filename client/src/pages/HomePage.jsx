@@ -32,7 +32,7 @@ const HomePage = () => {
         <div className="relative overflow-hidden mb-12 border-b border-white/5 dark:border-[#cdfb0a]/20 shadow-2xl">
           {/* Hero background image */}
           <img
-            src="/hero_bg.png"
+            src="/hero_bg.jpeg"
             alt="SK Sports Hero"
             className="absolute inset-0 w-full h-full object-cover object-center"
           />

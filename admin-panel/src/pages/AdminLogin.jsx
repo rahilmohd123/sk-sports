@@ -61,11 +61,7 @@ const AdminLogin = () => {
           </div>
 
           {/* Credentials hint */}
-          <div className="mb-6 bg-blue-900/30 border border-blue-700/40 rounded-xl p-3 text-xs text-blue-300">
-            <p className="font-semibold mb-1 flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5" /> Default Credentials (from .env)</p>
-            <p>Email: <span className="font-mono text-blue-200">{import.meta.env.VITE_ADMIN_EMAIL || 'admin@sksports.com'}</span></p>
-            <p>Password: <span className="font-mono text-blue-200">{import.meta.env.VITE_ADMIN_PASSWORD || 'Admin@123456'}</span></p>
-          </div>
+
 
           {error && (
             <div className="mb-5 flex items-start gap-2 bg-red-900/30 border border-red-700/40 text-red-300 rounded-xl p-3 text-sm">

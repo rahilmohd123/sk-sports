@@ -40,6 +40,7 @@ SK Sports is a premium, high-energy e-commerce platform for athletes and sports 
 
 ---
 
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -65,6 +66,7 @@ SK Sports is a premium, high-energy e-commerce platform for athletes and sports 
    # RAZORPAY_KEY_SECRET=your_secret
    npm run dev
    ```
+> env files are in each folders
 
 3. **Client Setup**:
    ```bash
@@ -79,6 +81,7 @@ SK Sports is a premium, high-energy e-commerce platform for athletes and sports 
    npm install
    npm run dev
    ```
+
 
 ---
 
