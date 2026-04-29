@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, X, Save, Package, AlertTriangle, Search, Loader2 } from 'lucide-react';
-import { useGetProductsQuery, useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation } from '../api/productsApiSlice';
+import { Plus, Edit2, Trash2, X, Save, Package, AlertTriangle, Search, Loader2, Upload, ImageIcon, Image } from 'lucide-react';
+import { useGetProductsQuery, useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation, useUploadImageMutation } from '../api/productsApiSlice';
 import { useGetCategoriesQuery } from '../api/categoriesApiSlice';
 
 const EMPTY_FORM = {
@@ -20,6 +20,7 @@ const Products = () => {
   const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
   const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation();
+  const [uploadImage, { isLoading: isUploadingImg }] = useUploadImageMutation();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -59,6 +60,25 @@ const Products = () => {
 
   const handleFormChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const res = await uploadImage(formData).unwrap();
+      // Add the new URL to the images list
+      setForm((prev) => ({
+        ...prev,
+        images: prev.images ? `${prev.images}, ${res.url}` : res.url
+      }));
+    } catch (err) {
+      setFormError('Failed to upload image. Please check your connection and Cloudinary settings.');
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -238,7 +258,6 @@ const Products = () => {
                 { label: 'Brand', name: 'brand', type: 'text', placeholder: 'e.g. SG Sports', required: true },
                 { label: 'Price (₹)', name: 'price', type: 'number', placeholder: '0.00', required: true, min: 0, step: '0.01' },
                 { label: 'Count In Stock', name: 'countInStock', type: 'number', placeholder: '0', required: true, min: 0 },
-                { label: 'Image URLs (comma-separated)', name: 'images', type: 'text', placeholder: 'https://..., https://...' },
               ].map(({ label, name, ...rest }) => (
                 <div key={name}>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">{label}</label>
@@ -251,6 +270,50 @@ const Products = () => {
                   />
                 </div>
               ))}
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 flex justify-between">
+                  <span>Product Images</span>
+                  <span className="text-[10px] text-gray-400 font-normal">URL or Upload</span>
+                </label>
+                
+                <div className="space-y-3">
+                  <div className="relative">
+                    <input
+                      name="images"
+                      value={form.images}
+                      onChange={handleFormChange}
+                      placeholder="Paste URLs (comma-separated)..."
+                      className="w-full pl-3 pr-10 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    />
+                    <ImageIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 h-px bg-gray-100 dark:bg-gray-800"></div>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">OR</span>
+                    <div className="flex-1 h-px bg-gray-100 dark:bg-gray-800"></div>
+                  </div>
+
+                  <label className={`
+                    flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-2xl cursor-pointer
+                    ${isUploadingImg ? 'bg-gray-50 border-blue-400' : 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-blue-500 hover:bg-blue-50/10'}
+                    transition-all duration-300
+                  `}>
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      {isUploadingImg ? (
+                        <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+                      ) : (
+                        <Upload className="w-6 h-6 mb-1 text-gray-400" />
+                      )}
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {isUploadingImg ? 'Uploading...' : <><span className="font-bold text-blue-600">Click to upload</span> to Cloudinary</>}
+                      </p>
+                    </div>
+                    <input type="file" className="hidden" onChange={handleFileUpload} accept="image/*" disabled={isUploadingImg} />
+                  </label>
+                </div>
+              </div>
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Category</label>

@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Plus, Trash2, X, Save, Layers, AlertTriangle, Loader2 } from 'lucide-react';
+import { Plus, Trash2, X, Save, Layers, AlertTriangle, Loader2, Upload, ImageIcon } from 'lucide-react';
 import { useGetCategoriesQuery, useCreateCategoryMutation, useDeleteCategoryMutation } from '../api/categoriesApiSlice';
+import { useUploadImageMutation } from '../api/productsApiSlice';
 
 const Categories = () => {
   const { data: categories = [], isLoading, isError } = useGetCategoriesQuery();
   const [createCategory, { isLoading: isCreating }] = useCreateCategoryMutation();
   const [deleteCategory, { isLoading: isDeleting }] = useDeleteCategoryMutation();
+  const [uploadImage, { isLoading: isUploadingImg }] = useUploadImageMutation();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ name: '', description: '', image: '' });
@@ -30,6 +32,21 @@ const Categories = () => {
       } catch (err) {
         alert(err?.data?.message || 'Failed to delete category.');
       }
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const res = await uploadImage(formData).unwrap();
+      setForm((prev) => ({ ...prev, image: res.url }));
+    } catch (err) {
+      setFormError('Failed to upload image. Please check your connection and Cloudinary settings.');
     }
   };
 
@@ -132,14 +149,41 @@ const Categories = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Image URL</label>
-                <input
-                  type="text"
-                  value={form.image}
-                  onChange={(e) => setForm({ ...form, image: e.target.value })}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                  placeholder="https://images.unsplash.com/..."
-                />
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 flex justify-between">
+                  <span>Category Image</span>
+                  <span className="text-[10px] text-gray-400 font-normal">URL or Upload</span>
+                </label>
+                
+                <div className="space-y-3">
+                  <div className="relative">
+                    <input
+                      name="image"
+                      value={form.image}
+                      onChange={(e) => setForm({ ...form, image: e.target.value })}
+                      placeholder="Paste image URL..."
+                      className="w-full pl-3 pr-10 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    />
+                    <ImageIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  </div>
+
+                  <label className={`
+                    flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-2xl cursor-pointer
+                    ${isUploadingImg ? 'bg-gray-50 border-blue-400' : 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-blue-500 hover:bg-blue-50/10'}
+                    transition-all duration-300
+                  `}>
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      {isUploadingImg ? (
+                        <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+                      ) : (
+                        <Upload className="w-6 h-6 mb-1 text-gray-400" />
+                      )}
+                      <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                        {isUploadingImg ? 'Uploading...' : <><span className="font-bold text-blue-600">Upload to Cloudinary</span></>}
+                      </p>
+                    </div>
+                    <input type="file" className="hidden" onChange={handleFileUpload} accept="image/*" disabled={isUploadingImg} />
+                  </label>
+                </div>
               </div>
               <div className="flex gap-3 pt-2">
                 <button
