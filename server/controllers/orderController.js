@@ -14,9 +14,11 @@ export const addOrderItems = async (req, res) => {
 
     const order = new Order({
       orderItems: orderItems.map((x) => ({
-        ...x,
+        name: x.name,
+        qty: x.qty,
+        images: x.images || [],
+        price: x.price,
         product: x._id,
-        _id: undefined,
       })),
       user: req.user._id,
       shippingAddress,

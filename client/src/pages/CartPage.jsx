@@ -1,17 +1,31 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { Trash2, ArrowRight, ArrowLeft } from 'lucide-react';
-import { useState } from 'react';
-
-// Using mock data
-const mockCart = [
-  { _id: '1', name: 'Pro Cricket Bat', image: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=150', price: 120.00, qty: 1, countInStock: 5 },
-  { _id: '2', name: 'Premium Football', image: 'https://images.unsplash.com/photo-1614632537190-23e4146777db?auto=format&fit=crop&w=150', price: 40.00, qty: 2, countInStock: 15 },
-];
+import { addToCart, removeFromCart, clearBuyNowItem } from '../slices/cartSlice';
+import { useEffect } from 'react';
 
 const CartPage = () => {
-  const [cartItems, setCartItems] = useState(mockCart);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const subtotal = cartItems.reduce((acc, item) => acc + item.qty * item.price, 0);
+  useEffect(() => {
+    dispatch(clearBuyNowItem());
+  }, [dispatch]);
+
+  const cart = useSelector((state) => state.cart);
+  const { cartItems, itemsPrice, totalPrice } = cart;
+
+  const addToCartHandler = async (product, qty) => {
+    dispatch(addToCart({ ...product, qty }));
+  };
+
+  const removeFromCartHandler = (id) => {
+    dispatch(removeFromCart(id));
+  };
+
+  const checkoutHandler = () => {
+    navigate('/login?redirect=/checkout');
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
@@ -31,22 +45,19 @@ const CartPage = () => {
             {cartItems.map((item) => (
               <div key={item._id} className="flex flex-col sm:flex-row items-center justify-between p-4 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-4 mb-4 sm:mb-0 w-full sm:w-auto">
-                  <img src={item.image} alt={item.name} className="w-24 h-24 object-cover rounded-xl" />
+                  <img src={item.images && item.images[0] ? item.images[0] : 'https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&q=80&w=400'} alt={item.name} className="w-24 h-24 object-cover rounded-xl" />
                   <div>
                     <Link to={`/product/${item._id}`} className="font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 text-lg transition-colors">
                       {item.name}
                     </Link>
-                    <div className="text-blue-600 dark:text-blue-400 font-extrabold mt-1">${item.price}</div>
+                    <div className="text-blue-600 dark:text-blue-400 font-extrabold mt-1">₹{item.price}</div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end">
                   <select 
                     value={item.qty}
-                    onChange={(e) => {
-                      const newQty = Number(e.target.value);
-                      setCartItems(cartItems.map(i => i._id === item._id ? {...i, qty: newQty} : i));
-                    }}
+                    onChange={(e) => addToCartHandler(item, Number(e.target.value))}
                     className="p-2 border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none"
                   >
                     {[...Array(item.countInStock).keys()].map((x) => (
@@ -57,7 +68,7 @@ const CartPage = () => {
                   </select>
                   
                   <button 
-                    onClick={() => setCartItems(cartItems.filter(i => i._id !== item._id))}
+                    onClick={() => removeFromCartHandler(item._id)}
                     className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                   >
                     <Trash2 className="w-5 h-5" />
@@ -75,27 +86,33 @@ const CartPage = () => {
               <div className="space-y-4 mb-6 text-gray-600 dark:text-gray-300">
                 <div className="flex justify-between">
                   <span>Subtotal ({cartItems.reduce((acc, i) => acc + i.qty, 0)} items)</span>
-                  <span className="font-semibold text-gray-900 dark:text-white">${subtotal.toFixed(2)}</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">₹{itemsPrice}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Shipping</span>
-                  <span className="font-semibold text-gray-900 dark:text-white">Calculated at checkout</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">₹{cart.shippingPrice}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Tax (15%)</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">₹{cart.taxPrice}</span>
                 </div>
               </div>
               
               <div className="border-t border-gray-200 dark:border-gray-800 pt-4 mb-8">
                 <div className="flex justify-between items-center text-lg font-extrabold text-gray-900 dark:text-white">
                   <span>Total Due</span>
-                  <span className="text-blue-600 dark:text-blue-400">${subtotal.toFixed(2)}</span>
+                  <span className="text-blue-600 dark:text-blue-400">₹{totalPrice}</span>
                 </div>
               </div>
 
-              <Link 
-                to="/checkout"
-                className="w-full flex items-center justify-center p-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-lg shadow-blue-500/30"
+              <button 
+                type="button"
+                onClick={checkoutHandler}
+                disabled={cartItems.length === 0}
+                className="w-full flex items-center justify-center p-4 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold rounded-xl transition-colors shadow-lg shadow-blue-500/30"
               >
                 Proceed to Checkout <ArrowRight className="w-5 h-5 ml-2" />
-              </Link>
+              </button>
             </div>
           </div>
         </div>
